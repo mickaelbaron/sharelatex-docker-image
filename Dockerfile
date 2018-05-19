@@ -28,7 +28,12 @@ RUN cd /var/www && npm install
 
 RUN cd /var/www/sharelatex; \
 	npm install; \
-	grunt install; \
+	grunt install;
+
+# Fix document-update build problem. Gruntfile.coffee was missing.
+COPY ${baseDir}/fix/Gruntfile.coffee /var/www/sharelatex/document-updater/Gruntfile.coffee
+
+RUN cd /var/www/sharelatex; \ 
 	bash -c 'source ./bin/install-services'; \
 	cd web; \
 	npm install; \
@@ -38,7 +43,7 @@ RUN cd /var/www/sharelatex; \
 	grunt compile;
 
 RUN cd /var/www && node git-revision > revisions.txt
-	
+
 # Minify js assets
 RUN cd /var/www/sharelatex/web; \
 	grunt compile:minify;
@@ -52,4 +57,3 @@ EXPOSE 80
 WORKDIR /
 
 ENTRYPOINT ["/sbin/my_init"]
-
